@@ -5,7 +5,7 @@ module.exports = {
     {
       name: 'smc-app',
       script: 'node_modules/next/dist/bin/next',
-      args: 'start -p 3000',
+      args: 'start -p 3020',
       cwd: __dirname,
       instances: 1,
       exec_mode: 'fork',
