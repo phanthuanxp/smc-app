@@ -37,10 +37,13 @@ function migrate(db: Database.Database) {
   addShopCol('refresh_token', 'refresh_token TEXT');
   addShopCol('token_expires_at', 'token_expires_at TEXT');
 
-  // sale_price for promotional pricing
+  // sale_price and image_url for products
   const prodCols = db.prepare("PRAGMA table_info(products)").all() as { name: string }[];
   if (!prodCols.some(c => c.name === 'sale_price')) {
     db.exec('ALTER TABLE products ADD COLUMN sale_price REAL DEFAULT 0');
+  }
+  if (!prodCols.some(c => c.name === 'image_url')) {
+    db.exec('ALTER TABLE products ADD COLUMN image_url TEXT DEFAULT \'\'');
   }
 
   // Seed default AI provider rows (one per provider, idempotent)

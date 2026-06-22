@@ -11,22 +11,27 @@ import { ChannelBadge, CHANNEL_LABELS } from '@/components/ChannelBadge';
 interface Product {
   id: number; sku: string; name: string; category: string; description: string;
   price: number; cost_price: number; sale_price: number; stock: number; weight: number;
-  status: string; channels: string | null; listing_count: number;
+  status: string; channels: string | null; listing_count: number; image_url: string;
   total_views: number; total_sales: number; seo_score: number; profit_margin: number;
 }
 interface Stats { total: number; active: number; out_of_stock: number; low_stock: number; }
 
 // ── SEO score helper ───────────────────────────────────────────────────────
+function seoColor(score: number): string {
+  // gradient: red(0) → orange(40) → yellow-green(70) → green(100)
+  if (score >= 85) return '#16a34a';
+  if (score >= 70) return '#4ade80';
+  if (score >= 55) return '#84cc16';
+  if (score >= 40) return '#ea580c';
+  return '#dc2626';
+}
+
 function SeoBar({ score }: { score: number }) {
-  const color = score >= 70 ? '#16a34a' : score >= 40 ? '#ea580c' : '#dc2626';
-  const label = score >= 70 ? 'Tốt' : score >= 40 ? 'TB' : 'Kém';
+  const color = seoColor(score);
   return (
-    <div className="flex items-center gap-1.5 min-w-[80px]">
-      <div className="flex-1 h-1.5 bg-[#f1f5f9] rounded-full overflow-hidden">
-        <div className="h-full rounded-full transition-all" style={{ width: `${score}%`, background: color }}/>
-      </div>
-      <span className="text-[11px] font-bold tabular-nums" style={{ color }}>{score}</span>
-      <span className="text-[9.5px] font-semibold" style={{ color }}>{label}</span>
+    <div className="flex items-center gap-1 min-w-[72px]">
+      <span className="text-[12px] font-extrabold tabular-nums" style={{ color }}>{score}</span>
+      <span className="text-[10px] font-semibold text-[#16a34a]">/100</span>
     </div>
   );
 }
@@ -187,6 +192,17 @@ function ProductDrawer({ product, onClose, onSaved }: {
                       <label className="block text-[11.5px] font-semibold text-[#64748b] mb-1">Danh mục</label>
                       <input value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                         className="w-full h-9 px-3 bg-[#f6f8fc] border border-[#e8edf5] rounded-[9px] text-[13px] outline-none focus:border-[#2563eb]"/>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[11.5px] font-semibold text-[#64748b] mb-1">URL Ảnh sản phẩm</label>
+                    <div className="flex gap-2 items-start">
+                      {form.image_url && (
+                        <img src={form.image_url} alt="" className="w-10 h-10 rounded-[8px] object-cover border border-[#e8edf5] flex-shrink-0"/>
+                      )}
+                      <input value={(form as Product & {image_url:string}).image_url || ''} onChange={e => setForm(f => ({ ...f, image_url: e.target.value }))}
+                        placeholder="https://..."
+                        className="flex-1 h-9 px-3 bg-[#f6f8fc] border border-[#e8edf5] rounded-[9px] text-[12.5px] outline-none focus:border-[#2563eb]"/>
                     </div>
                   </div>
                   <div>
@@ -557,8 +573,10 @@ export default function ProductsPage() {
               {products.map((p, idx) => (
                 <tr key={p.id} className="border-b border-[#f8fafc] hover:bg-[#fafbff] transition-colors group">
                   <td className="px-3 py-2.5">
-                    <div className="w-8 h-8 rounded-[8px] bg-gradient-to-br from-[#e0e7ff] to-[#c7d2fe] flex items-center justify-center text-[14px]">
-                      {EMOJIS[idx % EMOJIS.length]}
+                    <div className="w-8 h-8 rounded-[8px] overflow-hidden flex-shrink-0 bg-gradient-to-br from-[#e0e7ff] to-[#c7d2fe] flex items-center justify-center text-[14px]">
+                      {p.image_url
+                        ? <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" onError={e => { (e.target as HTMLImageElement).style.display='none'; (e.target as HTMLImageElement).parentElement!.textContent = EMOJIS[idx % EMOJIS.length]; }}/>
+                        : EMOJIS[idx % EMOJIS.length]}
                     </div>
                   </td>
                   <td className="px-3 py-2.5 text-[11px] text-[#94a3b8] font-mono whitespace-nowrap">{p.sku}</td>
@@ -596,7 +614,7 @@ export default function ProductsPage() {
                     <SeoBar score={p.seo_score}/>
                   </td>
                   <td className="px-3 py-2.5">
-                    <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-1">
                       <button onClick={() => setEditing(p)} title="Chỉnh sửa"
                         className="w-7 h-7 flex items-center justify-center rounded-[6px] text-[#64748b] hover:bg-[#eff6ff] hover:text-[#2563eb] transition-colors">
                         <Edit size={12}/>

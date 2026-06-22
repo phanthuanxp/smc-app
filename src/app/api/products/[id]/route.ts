@@ -21,10 +21,10 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const db = getDb();
   const body = await req.json();
-  const { name, category, description, price, cost_price, sale_price, stock, weight, status } = body;
+  const { name, category, description, price, cost_price, sale_price, stock, weight, status, image_url } = body;
   db.prepare(`
-    UPDATE products SET name=?, category=?, description=?, price=?, cost_price=?, sale_price=?, stock=?, weight=?, status=?, updated_at=datetime('now') WHERE id=?
-  `).run(name, category, description ?? '', price, cost_price ?? 0, sale_price ?? 0, stock, weight ?? 0, status, id);
+    UPDATE products SET name=?, category=?, description=?, price=?, cost_price=?, sale_price=?, stock=?, weight=?, status=?, image_url=?, updated_at=datetime('now') WHERE id=?
+  `).run(name, category, description ?? '', price, cost_price ?? 0, sale_price ?? 0, stock, weight ?? 0, status, image_url ?? '', id);
   return NextResponse.json({ ok: true });
 }
 
