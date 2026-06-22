@@ -211,15 +211,23 @@ function AiModelSection() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3 mb-3">
-                  {/* Model select */}
+                  {/* Model — free-text for 9router, select for others */}
                   <div>
                     <label className="block text-[11px] font-semibold text-[#64748b] mb-1">Model</label>
-                    <select
-                      value={cfg.model}
-                      onChange={e => saveModel(cfg.provider, e.target.value)}
-                      className="w-full h-9 px-2.5 bg-[#f6f8fc] border border-[#e8edf5] rounded-[8px] text-[12.5px] outline-none focus:border-[#2563eb] cursor-pointer">
-                      {models.map(m => <option key={m} value={m}>{m}</option>)}
-                    </select>
+                    {cfg.provider === '9router' ? (
+                      <input
+                        defaultValue={cfg.model}
+                        onBlur={e => saveModel(cfg.provider, e.target.value)}
+                        placeholder="vd: gpt-4o, claude-3-5-sonnet..."
+                        className="w-full h-9 px-2.5 bg-[#f6f8fc] border border-[#e8edf5] rounded-[8px] text-[12.5px] outline-none focus:border-[#2563eb]"/>
+                    ) : (
+                      <select
+                        value={cfg.model}
+                        onChange={e => saveModel(cfg.provider, e.target.value)}
+                        className="w-full h-9 px-2.5 bg-[#f6f8fc] border border-[#e8edf5] rounded-[8px] text-[12.5px] outline-none focus:border-[#2563eb] cursor-pointer">
+                        {models.map(m => <option key={m} value={m}>{m}</option>)}
+                      </select>
+                    )}
                   </div>
 
                   {/* Endpoint (9router only) */}
@@ -277,9 +285,15 @@ function AiModelSection() {
 
                 {/* Test result */}
                 {tr && (
-                  <div className={`mb-3 flex items-center gap-1.5 text-[12px] font-medium ${tr.ok ? 'text-[#16a34a]' : 'text-[#dc2626]'}`}>
-                    {tr.ok ? <Wifi size={12}/> : <WifiOff size={12}/>}
-                    {tr.msg}
+                  <div className={`mb-3 p-2.5 rounded-[8px] text-[12px] font-medium flex items-start gap-1.5 ${tr.ok ? 'bg-[#f0fdf4] text-[#16a34a]' : 'bg-[#fef2f2] text-[#dc2626]'}`}>
+                    {tr.ok ? <Wifi size={12} className="mt-0.5 flex-shrink-0"/> : <WifiOff size={12} className="mt-0.5 flex-shrink-0"/>}
+                    <span className="break-all">{tr.msg}</span>
+                  </div>
+                )}
+                {/* 9Router hint */}
+                {cfg.provider === '9router' && !tr && (
+                  <div className="mb-3 text-[11.5px] text-[#64748b]">
+                    Nhập đúng tên model mà 9Router hỗ trợ (xem dashboard 9Router). Ví dụ: <code className="bg-[#f1f5f9] px-1 rounded">gpt-4o</code>, <code className="bg-[#f1f5f9] px-1 rounded">claude-3-5-sonnet</code>
                   </div>
                 )}
 
