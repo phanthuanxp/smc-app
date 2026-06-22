@@ -6,7 +6,7 @@ export async function POST(req: NextRequest) {
   await seedDefaultUser();
   const { email, password } = await req.json();
   const db = getDb();
-  const user = db.prepare('SELECT * FROM users WHERE email=?').get(email) as
+  const user = db.prepare('SELECT * FROM users WHERE email=? OR name=?').get(email, email) as
     | { id: number; email: string; name: string; password_hash: string; role: string; status?: string }
     | undefined;
   if (!user || !(await verifyPassword(password, user.password_hash))) {

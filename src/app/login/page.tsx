@@ -4,8 +4,8 @@ import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [email, setEmail] = useState('admin@shopcore.vn');
-  const [password, setPassword] = useState('admin123');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -51,9 +51,9 @@ export default function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-[12.5px] font-semibold text-[#64748b] mb-1.5">Email</label>
+              <label className="block text-[12.5px] font-semibold text-[#64748b] mb-1.5">Tên đăng nhập</label>
               <input
-                type="email" value={email} onChange={e => setEmail(e.target.value)} required
+                type="text" value={email} onChange={e => setEmail(e.target.value)} required
                 className="w-full h-11 px-4 bg-[#f6f8fc] border border-[#e8edf5] rounded-[11px] text-[14px] outline-none focus:border-[#2563eb] focus:bg-white transition-colors"
               />
             </div>
@@ -78,9 +78,6 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-5 p-3 bg-[#f8fafc] rounded-[10px] text-[12px] text-[#64748b]">
-            <span className="font-semibold text-[#475569]">Tài khoản demo:</span> admin@shopcore.vn / admin123
-          </div>
         </div>
       </div>
     </div>

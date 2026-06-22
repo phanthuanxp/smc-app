@@ -60,7 +60,7 @@ export async function seedDefaultUser() {
   const db = getDb();
   const count = (db.prepare('SELECT COUNT(*) as c FROM users').get() as { c: number }).c;
   if (count > 0) return;
-  const hash = await hashPassword('admin123');
+  const hash = await hashPassword('Thuan@1987');
   db.prepare('INSERT INTO users (email, name, password_hash, role) VALUES (?,?,?,?)')
-    .run('admin@shopcore.vn', 'Admin', hash, 'owner');
+    .run('admintrip', 'Admin', hash, 'owner');
 }
