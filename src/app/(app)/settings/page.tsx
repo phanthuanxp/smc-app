@@ -131,6 +131,24 @@ function AiModelSection() {
     load();
   };
 
+  const setAsDefault = async (provider: string) => {
+    const sorted = [...configs].sort((a, b) => a.priority - b.priority);
+    const target = sorted.find(c => c.provider === provider);
+    if (!target) return;
+    // Shift all providers above target down by 1, set target to priority 1
+    const updates = sorted.map((c, i) => {
+      if (c.provider === provider) return { ...c, priority: 1 };
+      if (c.priority < target.priority) return { ...c, priority: i + 2 };
+      return c;
+    });
+    await Promise.all(
+      updates.map(c =>
+        fetch('/api/ai-config', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(c) })
+      )
+    );
+    load();
+  };
+
   const testConn = async (provider: string) => {
     setTesting(provider);
     const res = await fetch('/api/ai-config', {
@@ -171,6 +189,7 @@ function AiModelSection() {
         const models = PROVIDER_MODELS[cfg.provider] ?? [];
         const tr = testResult[cfg.provider];
         const isEditingThis = editing === cfg.provider;
+        const isDefault = idx === 0;
 
         return (
           <Card key={cfg.provider} padding="p-5">
@@ -196,8 +215,18 @@ function AiModelSection() {
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <span className="text-[14px] font-bold text-[#0f172a]">{PROVIDER_LABELS[cfg.provider] ?? cfg.provider}</span>
+                  {isDefault && cfg.enabled ? (
+                    <span className="text-[10.5px] font-bold px-2 py-0.5 rounded-full bg-[#2563eb] text-white">
+                      ★ Mặc định
+                    </span>
+                  ) : cfg.enabled ? (
+                    <button onClick={() => setAsDefault(cfg.provider)}
+                      className="text-[10.5px] font-semibold px-2 py-0.5 rounded-full border border-[#e8edf5] text-[#64748b] hover:border-[#2563eb] hover:text-[#2563eb] transition-colors">
+                      Đặt làm mặc định
+                    </button>
+                  ) : null}
                   {cfg.has_key && (
                     <span className="text-[10.5px] font-semibold px-2 py-0.5 rounded-full bg-[#f0fdf4] text-[#16a34a] border border-[#bbf7d0]">
                       Key: ••••{cfg.api_key_tail}
