@@ -5,7 +5,7 @@ export async function GET(_: NextRequest, { params }: { params: Promise<{ id: st
   const { id } = await params;
   const db = getDb();
   const product = db.prepare(`
-    SELECT p.*,
+    SELECT p.*, COALESCE(p.sale_price,0) as sale_price,
       (SELECT GROUP_CONCAT(DISTINCT s.channel) FROM listings l JOIN shops s ON l.shop_id=s.id WHERE l.product_id=p.id) as channels
     FROM products p WHERE p.id=?
   `).get(id);
@@ -21,10 +21,24 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
   const { id } = await params;
   const db = getDb();
   const body = await req.json();
-  const { name, category, description, price, cost_price, stock, weight, status } = body;
+  const { name, category, description, price, cost_price, sale_price, stock, weight, status } = body;
   db.prepare(`
-    UPDATE products SET name=?, category=?, description=?, price=?, cost_price=?, stock=?, weight=?, status=?, updated_at=datetime('now') WHERE id=?
-  `).run(name, category, description, price, cost_price, stock, weight, status, id);
+    UPDATE products SET name=?, category=?, description=?, price=?, cost_price=?, sale_price=?, stock=?, weight=?, status=?, updated_at=datetime('now') WHERE id=?
+  `).run(name, category, description ?? '', price, cost_price ?? 0, sale_price ?? 0, stock, weight ?? 0, status, id);
+  return NextResponse.json({ ok: true });
+}
+
+// Partial update — only fields provided
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const db = getDb();
+  const body = await req.json() as Record<string, unknown>;
+  const allowed = ['name','category','description','price','cost_price','sale_price','stock','weight','status'];
+  const fields = Object.keys(body).filter(k => allowed.includes(k));
+  if (fields.length === 0) return NextResponse.json({ ok: true });
+  const setClause = fields.map(f => `${f}=?`).join(', ');
+  const values = fields.map(f => body[f]);
+  db.prepare(`UPDATE products SET ${setClause}, updated_at=datetime('now') WHERE id=?`).run(...values, id);
   return NextResponse.json({ ok: true });
 }
 

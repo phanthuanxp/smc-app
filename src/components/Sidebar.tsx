@@ -10,7 +10,7 @@ import { canAccess, ModuleId } from '@/lib/permissions';
 const NAV: { href: string; icon: typeof LayoutDashboard; label: string; module: ModuleId }[] = [
   { href: '/',               icon: LayoutDashboard, label: 'Tổng quan',            module: 'dashboard' },
   { href: '/shops',          icon: Link2,            label: 'Shop kết nối',         module: 'shops' },
-  { href: '/products',       icon: Tag,              label: 'Sản phẩm gốc',         module: 'products' },
+  { href: '/products',       icon: Tag,              label: 'All Sản Phẩm',          module: 'products' },
   { href: '/import',         icon: Download,         label: 'Import sản phẩm',      module: 'import' },
   { href: '/ai-products',    icon: Sparkles,         label: 'AI tạo sản phẩm',      module: 'ai-products' },
   { href: '/multichannel',   icon: Share2,           label: 'Đăng đa kênh',         module: 'multichannel' },
