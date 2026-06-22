@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Anthropic from '@anthropic-ai/sdk';
+import { routeAi } from '@/lib/ai-router';
 
-// Each AI action maps to a system prompt tailored for Vietnamese e-commerce listings.
 const PROMPTS: Record<string, string> = {
   title:
     'Bạn là chuyên gia tối ưu tiêu đề sản phẩm cho sàn TMĐT Việt Nam (Shopee, TikTok Shop, Lazada). ' +
@@ -28,49 +27,17 @@ export async function POST(req: NextRequest) {
   const { action, input } = await req.json();
 
   const system = PROMPTS[action];
-  if (!system) {
-    return NextResponse.json({ error: 'Hành động AI không hợp lệ' }, { status: 400 });
-  }
-  if (!input || !String(input).trim()) {
-    return NextResponse.json({ error: 'Vui lòng nhập thông tin sản phẩm' }, { status: 400 });
-  }
-
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json(
-      {
-        error:
-          'Chưa cấu hình ANTHROPIC_API_KEY. Thêm khóa vào file .env.local rồi khởi động lại server để dùng AI thật.',
-        configRequired: true,
-      },
-      { status: 503 }
-    );
-  }
+  if (!system) return NextResponse.json({ error: 'Hành động AI không hợp lệ' }, { status: 400 });
+  if (!input?.trim()) return NextResponse.json({ error: 'Vui lòng nhập thông tin sản phẩm' }, { status: 400 });
 
   try {
-    const client = new Anthropic({ apiKey });
-    const message = await client.messages.create({
-      model: 'claude-opus-4-8',
-      max_tokens: 2048,
-      thinking: { type: 'adaptive' },
-      output_config: { effort: 'medium' },
-      system,
-      messages: [{ role: 'user', content: `Thông tin sản phẩm:\n${input}` }],
-    });
-
-    if (message.stop_reason === 'refusal') {
-      return NextResponse.json({ error: 'Yêu cầu bị từ chối vì lý do an toàn.' }, { status: 422 });
-    }
-
-    const text = message.content
-      .filter((b): b is Anthropic.TextBlock => b.type === 'text')
-      .map(b => b.text)
-      .join('\n')
-      .trim();
-
-    return NextResponse.json({ result: text });
+    const { result, provider, model } = await routeAi(system, `Thông tin sản phẩm:\n${input}`);
+    return NextResponse.json({ result, provider, model });
   } catch (e: unknown) {
-    const msg = e instanceof Error ? e.message : 'Lỗi gọi Claude API';
-    return NextResponse.json({ error: msg }, { status: 500 });
+    const err = e as Error & { configRequired?: boolean };
+    if (err.configRequired) {
+      return NextResponse.json({ error: err.message, configRequired: true }, { status: 503 });
+    }
+    return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

@@ -36,6 +36,19 @@ function migrate(db: Database.Database) {
   addShopCol('access_token', 'access_token TEXT');
   addShopCol('refresh_token', 'refresh_token TEXT');
   addShopCol('token_expires_at', 'token_expires_at TEXT');
+
+  // Seed default AI provider rows (one per provider, idempotent)
+  const AI_DEFAULTS = [
+    { provider: 'claude',   model: 'claude-sonnet-4-6', priority: 1 },
+    { provider: 'openai',   model: 'gpt-4o',            priority: 2 },
+    { provider: 'gemini',   model: 'gemini-2.0-flash',  priority: 3 },
+    { provider: 'grok',     model: 'grok-2-latest',     priority: 4 },
+    { provider: '9router',  model: 'auto',              priority: 5 },
+  ];
+  const insertAi = db.prepare(
+    'INSERT OR IGNORE INTO ai_configs (provider, model, priority) VALUES (?,?,?)'
+  );
+  for (const r of AI_DEFAULTS) insertAi.run(r.provider, r.model, r.priority);
 }
 
 function initSchema(db: Database.Database) {
@@ -151,6 +164,17 @@ function initSchema(db: Database.Database) {
       status TEXT NOT NULL,      -- success | error
       message TEXT,
       created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS ai_configs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      provider TEXT NOT NULL UNIQUE,
+      api_key TEXT DEFAULT '',
+      model TEXT DEFAULT '',
+      endpoint TEXT DEFAULT '',
+      enabled INTEGER DEFAULT 0,
+      priority INTEGER DEFAULT 99,
+      updated_at TEXT DEFAULT (datetime('now'))
     );
   `);
 }
