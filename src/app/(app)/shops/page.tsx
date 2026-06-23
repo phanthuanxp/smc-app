@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, RefreshCw, CheckCircle, XCircle, AlertCircle, Link2 } from 'lucide-react';
 import Card, { SectionHeader } from '@/components/Card';
-import { CHANNEL_LABELS } from '@/components/ChannelBadge';
+import { CHANNEL_LABELS, ChannelBadgeLg, ChannelBadge } from '@/components/ChannelBadge';
 import PageShell from '@/components/PageShell';
 
 const CONNECTABLE = [
@@ -98,9 +98,7 @@ export default function ShopsPage() {
             <button key={c.channel} onClick={()=>setFilter(filter===c.channel?'':c.channel)}
               className={`bg-white border rounded-[16px] p-4 text-left hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 ${filter===c.channel?'border-[#2563eb] ring-1 ring-[#2563eb]':'border-[#e8edf5]'}`}
               style={{boxShadow:'0 2px 8px rgba(15,23,42,0.04)'}}>
-              <div className="w-9 h-9 rounded-[9px] flex items-center justify-center text-[13px] font-bold text-white mb-2.5" style={{background:ch.bg==='#f1f5f9'?'#64748b':ch.bg,color:'#fff'}}>
-                {ch.short}
-              </div>
+              <div className="mb-2.5"><ChannelBadgeLg channel={c.channel}/></div>
               <div className="text-[12px] text-[#64748b] mb-0.5">{ch.label}</div>
               <div className="text-[20px] font-extrabold text-[#0f172a]">{c.count} <span className="text-[12px] font-medium text-[#94a3b8]">shop</span></div>
               <div className="text-[11px] text-[#64748b] mt-1">{Math.round(c.revenue/1_000_000).toLocaleString('vi-VN')}M doanh thu</div>
@@ -136,7 +134,7 @@ export default function ShopsPage() {
                   <td className="px-3 py-3 font-semibold text-[13px] text-[#0f172a]">{s.name}</td>
                   <td className="px-3 py-3">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[12px] font-semibold text-white" style={{background:ch.bg==='#f1f5f9'?'#64748b':ch.bg}}>
-                      {ch.short} {ch.label}
+                      <ChannelBadge channel={s.channel}/> {ch.label}
                     </span>
                   </td>
                   <td className="px-3 py-3">

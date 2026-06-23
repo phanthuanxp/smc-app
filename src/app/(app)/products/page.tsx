@@ -5,7 +5,7 @@ import {
   TrendingUp, Package, AlertTriangle, XCircle, Star, Rocket, Copy, Check, Loader2,
 } from 'lucide-react';
 import PageShell from '@/components/PageShell';
-import { ChannelBadge, CHANNEL_LABELS } from '@/components/ChannelBadge';
+import { ChannelBadge, ChannelBadgeMd, CHANNEL_LABELS } from '@/components/ChannelBadge';
 
 // ── Types ──────────────────────────────────────────────────────────────────
 interface Product {
@@ -272,11 +272,10 @@ function ProductDrawer({ product, onClose, onSaved }: {
                 <p className="text-[11px] font-bold text-[#94a3b8] uppercase tracking-wider mb-2">Deploy lên sàn</p>
                 <div className="space-y-1.5">
                   {shops.slice(0, 6).map(shop => {
-                    const ch = CHANNEL_LABELS[shop.channel] ?? { bg: '#64748b', short: shop.channel[0], label: shop.channel };
                     return (
                       <div key={shop.id} className="flex items-center justify-between p-2.5 bg-[#f8fafc] rounded-[9px]">
                         <div className="flex items-center gap-2">
-                          <span className="w-6 h-6 rounded-[6px] flex items-center justify-center text-white text-[10px] font-bold" style={{ background: ch.bg === '#f1f5f9' ? '#64748b' : ch.bg }}>{ch.short}</span>
+                          <ChannelBadgeMd channel={shop.channel}/>
                           <span className="text-[12.5px] font-medium text-[#374151] truncate max-w-[200px]">{shop.name}</span>
                         </div>
                         <button onClick={() => deployToShop(shop.id)} disabled={deploying === shop.id}
