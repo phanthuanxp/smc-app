@@ -2,29 +2,74 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
-  LayoutDashboard, Link2, Tag, Download, Sparkles, Share2,
-  Package, ShoppingCart, BarChart3, FileText, Settings, Star, Users
+  LayoutDashboard, Tag, Share2,
+  Package, ShoppingCart, BarChart3, FileText, Settings, Star, Users, Plus
 } from 'lucide-react';
 import { canAccess, ModuleId } from '@/lib/permissions';
 
-const NAV: { href: string; icon: typeof LayoutDashboard; label: string; module: ModuleId }[] = [
-  { href: '/',               icon: LayoutDashboard, label: 'Tổng quan',            module: 'dashboard' },
-  { href: '/shops',          icon: Link2,            label: 'Shop kết nối',         module: 'shops' },
-  { href: '/products',       icon: Tag,              label: 'All Sản Phẩm',          module: 'products' },
-  { href: '/import',         icon: Download,         label: 'Import sản phẩm',      module: 'import' },
-  { href: '/ai-products',    icon: Sparkles,         label: 'AI tạo sản phẩm',      module: 'ai-products' },
-  { href: '/multichannel',   icon: Share2,           label: 'Đăng đa kênh',         module: 'multichannel' },
-  { href: '/inventory',      icon: Package,          label: 'Tồn kho',              module: 'inventory' },
-  { href: '/orders',         icon: ShoppingCart,     label: 'Đơn hàng',             module: 'orders' },
-  { href: '/market',         icon: BarChart3,        label: 'Phân tích thị trường', module: 'market' },
-  { href: '/reports',        icon: FileText,         label: 'Báo cáo',              module: 'reports' },
-  { href: '/team',           icon: Users,            label: 'Quản lý nhóm',         module: 'team' },
-  { href: '/settings',       icon: Settings,         label: 'Cài đặt',              module: 'settings' },
-];
+// TikTok icon
+function TikTokIcon({ size = 17, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.73a4.85 4.85 0 0 1-1.01-.04z"/>
+    </svg>
+  );
+}
+
+// Shopee icon
+function ShopeeIcon({ size = 17, color = 'currentColor' }: { size?: number; color?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill={color}>
+      <path d="M12 2C9.243 2 7 4.243 7 7H5a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2c0-2.757-2.243-5-5-5zm0 2a3 3 0 0 1 3 3H9a3 3 0 0 1 3-3zm0 8a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/>
+    </svg>
+  );
+}
+
+type NavSection = {
+  label?: string;
+  items: { href: string; icon: React.ReactNode; label: string; module: ModuleId; sub?: string }[];
+};
 
 export default function Sidebar({ role = 'owner' }: { role?: string }) {
   const pathname = usePathname();
-  const nav = NAV.filter(item => canAccess(role, item.module));
+
+  const sections: NavSection[] = [
+    {
+      items: [
+        { href: '/', icon: <LayoutDashboard size={17} strokeWidth={1.8}/>, label: 'Tổng quan', module: 'dashboard' },
+      ],
+    },
+    {
+      label: 'CÁC SÀN',
+      items: [
+        { href: '/tiktok', icon: <TikTokIcon size={16}/>, label: 'TikTok Shop', module: 'tiktok', sub: 'tiktok' },
+        { href: '/shopee', icon: <ShopeeIcon size={16}/>, label: 'Shopee', module: 'shopee', sub: 'shopee' },
+      ],
+    },
+    {
+      label: 'QUẢN LÝ',
+      items: [
+        { href: '/products', icon: <Tag size={17} strokeWidth={1.8}/>, label: 'All Sản Phẩm', module: 'products' },
+        { href: '/multichannel', icon: <Share2 size={17} strokeWidth={1.8}/>, label: 'Đăng đa kênh', module: 'multichannel' },
+        { href: '/inventory', icon: <Package size={17} strokeWidth={1.8}/>, label: 'Tồn kho', module: 'inventory' },
+        { href: '/orders', icon: <ShoppingCart size={17} strokeWidth={1.8}/>, label: 'Đơn hàng', module: 'orders' },
+      ],
+    },
+    {
+      label: 'PHÂN TÍCH',
+      items: [
+        { href: '/market', icon: <BarChart3 size={17} strokeWidth={1.8}/>, label: 'Phân tích thị trường', module: 'market' },
+        { href: '/reports', icon: <FileText size={17} strokeWidth={1.8}/>, label: 'Báo cáo', module: 'reports' },
+      ],
+    },
+    {
+      label: 'HỆ THỐNG',
+      items: [
+        { href: '/team', icon: <Users size={17} strokeWidth={1.8}/>, label: 'Quản lý nhóm', module: 'team' },
+        { href: '/settings', icon: <Settings size={17} strokeWidth={1.8}/>, label: 'Cài đặt', module: 'settings' },
+      ],
+    },
+  ];
 
   return (
     <aside
@@ -54,32 +99,70 @@ export default function Sidebar({ role = 'owner' }: { role?: string }) {
 
       {/* Nav */}
       <nav className="px-3 py-3 flex-1">
-        {nav.map((item) => {
-          const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
-          const Icon = item.icon;
-          const showDivider = item.module === 'inventory' || item.module === 'team';
+        {sections.map((section, si) => {
+          const visibleItems = section.items.filter(item => canAccess(role, item.module));
+          if (visibleItems.length === 0) return null;
           return (
-            <div key={item.href}>
-              {showDivider && <div className="my-2" style={{ borderTop: '1px solid var(--smc-border-2)' }}/>}
-              <Link
-                href={item.href}
-                className="flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] mb-0.5 text-[13.5px] font-medium relative transition-all duration-150"
-                style={active ? {
-                  background: 'var(--smc-nav-active)',
-                  color: '#2563eb',
-                  fontWeight: 600,
-                } : {
-                  color: 'var(--smc-text-3)',
-                }}
-                onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'var(--smc-nav-hover)'; e.currentTarget.style.color = 'var(--smc-text)'; } }}
-                onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--smc-text-3)'; } }}
-              >
-                {active && (
-                  <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 bg-[#2563eb] rounded-r-full"/>
-                )}
-                <Icon size={17} color={active ? '#2563eb' : 'var(--smc-text-4)'} strokeWidth={active ? 2.2 : 1.8}/>
-                {item.label}
-              </Link>
+            <div key={si} className={si > 0 ? 'mt-1' : ''}>
+              {section.label && (
+                <div
+                  className="px-3 pt-3 pb-1 text-[10px] font-bold tracking-widest"
+                  style={{ color: 'var(--smc-text-4)' }}
+                >
+                  {section.label}
+                </div>
+              )}
+              {visibleItems.map((item) => {
+                const active = item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+                const isTiktok = item.href === '/tiktok';
+                const isShopee = item.href === '/shopee';
+                const platformActive = isTiktok ? active : isShopee ? active : null;
+
+                const activeColor = isTiktok ? '#e11d48' : isShopee ? '#ea580c' : '#2563eb';
+                const activeBg = isTiktok ? 'rgba(225,29,72,0.08)' : isShopee ? 'rgba(234,88,12,0.08)' : 'var(--smc-nav-active)';
+
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className="flex items-center gap-2.5 px-3 py-2.5 rounded-[10px] mb-0.5 text-[13.5px] font-medium relative transition-all duration-150"
+                    style={active ? {
+                      background: activeBg,
+                      color: activeColor,
+                      fontWeight: 600,
+                    } : {
+                      color: 'var(--smc-text-3)',
+                    }}
+                    onMouseEnter={e => { if (!active) { e.currentTarget.style.background = 'var(--smc-nav-hover)'; e.currentTarget.style.color = 'var(--smc-text)'; } }}
+                    onMouseLeave={e => { if (!active) { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--smc-text-3)'; } }}
+                  >
+                    {active && (
+                      <span
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full"
+                        style={{ background: activeColor }}
+                      />
+                    )}
+                    <span style={{ color: active ? activeColor : 'var(--smc-text-4)' }}>
+                      {item.icon}
+                    </span>
+                    {item.label}
+                  </Link>
+                );
+              })}
+
+              {/* "Thêm sàn" button after platform section */}
+              {section.label === 'CÁC SÀN' && canAccess(role, 'shops') && (
+                <Link
+                  href="/shops"
+                  className="flex items-center gap-2 px-3 py-2 rounded-[10px] mb-0.5 text-[12px] transition-all duration-150"
+                  style={{ color: 'var(--smc-text-4)' }}
+                  onMouseEnter={e => { e.currentTarget.style.background = 'var(--smc-nav-hover)'; e.currentTarget.style.color = 'var(--smc-text-3)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'var(--smc-text-4)'; }}
+                >
+                  <Plus size={13} strokeWidth={2}/>
+                  Kết nối sàn mới
+                </Link>
+              )}
             </div>
           );
         })}

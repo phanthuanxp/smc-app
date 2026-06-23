@@ -7,7 +7,7 @@
 export type Role = 'owner' | 'manager' | 'staff' | 'accountant';
 
 export type ModuleId =
-  | 'dashboard' | 'shops' | 'products' | 'import' | 'ai-products'
+  | 'dashboard' | 'tiktok' | 'shopee' | 'shops' | 'products'
   | 'multichannel' | 'inventory' | 'orders' | 'market' | 'reports'
   | 'settings' | 'team';
 
@@ -20,9 +20,9 @@ export const ROLE_LABELS: Record<Role, string> = {
 
 // Which modules each role may access.
 const ROLE_MODULES: Record<Role, ModuleId[]> = {
-  owner: ['dashboard','shops','products','import','ai-products','multichannel','inventory','orders','market','reports','settings','team'],
-  manager: ['dashboard','shops','products','import','ai-products','multichannel','inventory','orders','market','reports','settings'],
-  staff: ['dashboard','shops','products','import','ai-products','multichannel','inventory','orders'],
+  owner: ['dashboard','tiktok','shopee','shops','products','multichannel','inventory','orders','market','reports','settings','team'],
+  manager: ['dashboard','tiktok','shopee','shops','products','multichannel','inventory','orders','market','reports','settings'],
+  staff: ['dashboard','tiktok','shopee','shops','products','multichannel','inventory','orders'],
   accountant: ['dashboard','orders','market','reports'],
 };
 
@@ -31,8 +31,8 @@ export function pathToModule(pathname: string): ModuleId | null {
   if (pathname === '/' ) return 'dashboard';
   const seg = pathname.split('/')[1];
   const map: Record<string, ModuleId> = {
-    shops: 'shops', products: 'products', import: 'import',
-    'ai-products': 'ai-products', multichannel: 'multichannel',
+    tiktok: 'tiktok', shopee: 'shopee', shops: 'shops',
+    products: 'products', multichannel: 'multichannel',
     inventory: 'inventory', orders: 'orders', market: 'market',
     reports: 'reports', settings: 'settings', team: 'team',
   };
