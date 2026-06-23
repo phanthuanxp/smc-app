@@ -4,7 +4,7 @@ import { getDb } from '@/lib/db';
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const db = getDb();
-  const shop = db.prepare('SELECT * FROM shops WHERE id=?').get(id);
+  const shop = db.prepare('SELECT id,name,channel,status,product_count,revenue,orders,connected_at,token_expires_at,external_shop_id FROM shops WHERE id=?').get(id);
   if (!shop) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const logs = db.prepare(
