@@ -21,7 +21,7 @@ export async function GET() {
 
   const topProducts = db.prepare(`
     SELECT p.*,
-      (SELECT GROUP_CONCAT(s.channel) FROM listings l JOIN shops s ON l.shop_id=s.id WHERE l.product_id=p.id AND l.status='active') as channels
+      (SELECT GROUP_CONCAT(DISTINCT s.channel) FROM listings l JOIN shops s ON l.shop_id=s.id WHERE l.product_id=p.id AND l.status='active') as channels
     FROM products p ORDER BY p.id LIMIT 6
   `).all();
 

@@ -13,10 +13,12 @@ export async function GET(req: NextRequest) {
   const limit  = 20;
   const offset = (page - 1) * limit;
 
+  const channel = searchParams.get('channel') ?? '';
   let where = 'WHERE 1=1';
   const params: unknown[] = [];
-  if (q)      { where += ' AND (o.order_no LIKE ? OR o.customer_name LIKE ?)'; params.push(`%${q}%`, `%${q}%`); }
-  if (status) { where += ' AND o.status=?'; params.push(status); }
+  if (q)       { where += ' AND (o.order_no LIKE ? OR o.customer_name LIKE ?)'; params.push(`%${q}%`, `%${q}%`); }
+  if (status)  { where += ' AND o.status=?'; params.push(status); }
+  if (channel) { where += ' AND s.channel=?'; params.push(channel); }
 
   const orders = db.prepare(`
     SELECT o.*, s.channel, s.name as shop_name
@@ -24,7 +26,7 @@ export async function GET(req: NextRequest) {
     ${where} ORDER BY o.created_at DESC LIMIT ? OFFSET ?
   `).all(...params, limit, offset);
 
-  const total = (db.prepare(`SELECT COUNT(*) as c FROM orders o ${where}`).get(...params) as { c: number }).c;
+  const total = (db.prepare(`SELECT COUNT(*) as c FROM orders o JOIN shops s ON o.shop_id=s.id ${where}`).get(...params) as { c: number }).c;
   return NextResponse.json({ orders, total, page });
 }
 
