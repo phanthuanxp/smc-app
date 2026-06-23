@@ -8,8 +8,12 @@ interface CardProps {
 export default function Card({ children, className = '', padding = 'p-5' }: CardProps) {
   return (
     <div
-      className={`bg-white border border-[#e8edf5] rounded-[18px] ${padding} ${className}`}
-      style={{ boxShadow: '0 2px 12px rgba(15,23,42,0.05)' }}
+      className={`rounded-[18px] ${padding} ${className} transition-colors`}
+      style={{
+        background: 'var(--smc-surface)',
+        border: '1px solid var(--smc-border)',
+        boxShadow: '0 2px 12px var(--smc-shadow)',
+      }}
     >
       {children}
     </div>
@@ -19,7 +23,7 @@ export default function Card({ children, className = '', padding = 'p-5' }: Card
 export function SectionHeader({ title, action }: { title: ReactNode; action?: ReactNode }) {
   return (
     <div className="flex items-center justify-between mb-4">
-      <h2 className="text-[15px] font-bold text-[#0f172a]">{title}</h2>
+      <h2 className="text-[15px] font-bold" style={{ color: 'var(--smc-text)' }}>{title}</h2>
       {action}
     </div>
   );

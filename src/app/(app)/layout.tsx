@@ -8,7 +8,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect("/login");
 
   return (
-    <div className="h-full flex overflow-hidden bg-[#f6f8fc]">
+    <div className="h-full flex overflow-hidden" style={{ background: 'var(--smc-bg)' }}>
       <Sidebar role={user.role} />
       <div className="flex-1 flex flex-col overflow-hidden">
         <Header user={user} />
