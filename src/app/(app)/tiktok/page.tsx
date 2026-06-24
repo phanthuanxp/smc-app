@@ -1,4 +1,4 @@
-'use client';
+import { Suspense } from 'react';
 import PlatformHub, { PlatformConfig, AiTool } from '@/components/PlatformHub';
 import { Sparkles, Zap, MessageSquare, TrendingUp, Clock, Tag } from 'lucide-react';
 
@@ -71,5 +71,9 @@ const cfg: PlatformConfig = {
 };
 
 export default function TikTokPage() {
-  return <PlatformHub cfg={cfg}/>;
+  return (
+    <Suspense fallback={<div className="flex-1 flex items-center justify-center" style={{ color: 'var(--smc-text-4)' }}>Đang tải...</div>}>
+      <PlatformHub cfg={cfg}/>
+    </Suspense>
+  );
 }

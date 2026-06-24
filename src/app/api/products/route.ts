@@ -90,13 +90,14 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const db = getDb();
   const body = await req.json();
-  const { sku, name, category, description, price, cost_price, sale_price, stock, weight } = body;
+  const { sku, name, category, description, price, cost_price, sale_price, stock, weight, status, image_url } = body;
+  if (!sku || !name || !price) return NextResponse.json({ error: 'Thiếu sku, name hoặc price' }, { status: 400 });
   try {
     const result = db.prepare(`
-      INSERT INTO products (sku, name, category, description, price, cost_price, sale_price, stock, weight)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `).run(sku, name, category, description ?? '', price, cost_price ?? 0, sale_price ?? 0, stock ?? 0, weight ?? 0);
-    return NextResponse.json({ id: result.lastInsertRowid }, { status: 201 });
+      INSERT INTO products (sku, name, category, description, price, cost_price, sale_price, stock, weight, status, image_url)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `).run(sku, name, category ?? '', description ?? '', price, cost_price ?? 0, sale_price ?? 0, stock ?? 0, weight ?? 0, status ?? 'active', image_url ?? '');
+    return NextResponse.json({ ok: true, id: result.lastInsertRowid }, { status: 201 });
   } catch (e: unknown) {
     return NextResponse.json({ error: (e as Error).message }, { status: 400 });
   }

@@ -35,9 +35,11 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ chan
                   VALUES (?,?,?,?,?,?,?)`)
         .run(name, ch, 'active', extId, tokens.accessToken, tokens.refreshToken, tokens.expiresAt);
     }
-    return NextResponse.redirect(new URL('/shops?connected=' + ch, req.url));
+    const dest = (ch === 'tiktok' || ch === 'shopee') ? `/${ch}` : '/shops';
+    return NextResponse.redirect(new URL(`${dest}?connected=true`, req.url));
   } catch (e) {
     const msg = encodeURIComponent(e instanceof Error ? e.message : 'exchange_failed');
-    return NextResponse.redirect(new URL('/shops?error=' + msg, req.url));
+    const dest = (ch === 'tiktok' || ch === 'shopee') ? `/${ch}` : '/shops';
+    return NextResponse.redirect(new URL(`${dest}?error=${msg}`, req.url));
   }
 }

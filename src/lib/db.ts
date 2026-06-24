@@ -185,5 +185,104 @@ function initSchema(db: Database.Database) {
       priority INTEGER DEFAULT 99,
       updated_at TEXT DEFAULT (datetime('now'))
     );
+
+    CREATE TABLE IF NOT EXISTS affiliate_products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel TEXT NOT NULL,
+      shop_id INTEGER REFERENCES shops(id),
+      product_id INTEGER REFERENCES products(id),
+      commission_rate REAL NOT NULL DEFAULT 10,
+      status TEXT DEFAULT 'active',
+      clicks INTEGER DEFAULT 0,
+      conversions INTEGER DEFAULT 0,
+      revenue REAL DEFAULT 0,
+      external_id TEXT,
+      enrolled_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS affiliate_creators (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel TEXT NOT NULL,
+      shop_id INTEGER REFERENCES shops(id),
+      creator_name TEXT NOT NULL,
+      creator_handle TEXT,
+      followers INTEGER DEFAULT 0,
+      gmv REAL DEFAULT 0,
+      orders INTEGER DEFAULT 0,
+      commission_earned REAL DEFAULT 0,
+      status TEXT DEFAULT 'active',
+      joined_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS deals (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel TEXT NOT NULL,
+      shop_id INTEGER REFERENCES shops(id),
+      name TEXT NOT NULL,
+      discount_type TEXT NOT NULL DEFAULT 'percent',
+      discount_value REAL NOT NULL,
+      min_purchase REAL DEFAULT 0,
+      max_discount REAL DEFAULT 0,
+      start_at TEXT NOT NULL,
+      end_at TEXT NOT NULL,
+      status TEXT DEFAULT 'scheduled',
+      external_id TEXT,
+      products TEXT DEFAULT '[]',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS vouchers (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel TEXT NOT NULL,
+      shop_id INTEGER REFERENCES shops(id),
+      code TEXT NOT NULL,
+      discount_type TEXT NOT NULL DEFAULT 'percent',
+      discount_value REAL NOT NULL,
+      min_purchase REAL DEFAULT 0,
+      max_discount REAL DEFAULT 0,
+      usage_limit INTEGER DEFAULT 100,
+      usage_count INTEGER DEFAULT 0,
+      start_at TEXT NOT NULL,
+      end_at TEXT NOT NULL,
+      status TEXT DEFAULT 'active',
+      external_id TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS live_sessions (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel TEXT NOT NULL,
+      shop_id INTEGER REFERENCES shops(id),
+      title TEXT NOT NULL,
+      scheduled_at TEXT NOT NULL,
+      duration_minutes INTEGER DEFAULT 60,
+      status TEXT DEFAULT 'scheduled',
+      products TEXT DEFAULT '[]',
+      script TEXT DEFAULT '',
+      viewer_count INTEGER DEFAULT 0,
+      orders_count INTEGER DEFAULT 0,
+      gmv REAL DEFAULT 0,
+      stream_url TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')),
+      updated_at TEXT DEFAULT (datetime('now'))
+    );
+
+    CREATE TABLE IF NOT EXISTS returns (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      channel TEXT NOT NULL,
+      order_id INTEGER REFERENCES orders(id),
+      order_no TEXT NOT NULL,
+      shop_id INTEGER REFERENCES shops(id),
+      customer_name TEXT NOT NULL,
+      reason TEXT NOT NULL,
+      items TEXT DEFAULT '[]',
+      refund_amount REAL DEFAULT 0,
+      status TEXT DEFAULT 'pending',
+      restock INTEGER DEFAULT 1,
+      note TEXT DEFAULT '',
+      created_at TEXT DEFAULT (datetime('now')),
+      resolved_at TEXT
+    );
   `);
 }
