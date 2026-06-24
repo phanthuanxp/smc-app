@@ -376,13 +376,18 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
   useEffect(() => {
     loadConfig();
     loadShops();
+  }, [loadConfig, loadShops]);
+
+  // Banner check on mount only — searchParams not in deps to avoid infinite loop
+  useEffect(() => {
     if (searchParams.get('connected') === 'true') {
       setBanner({ type: 'ok', msg: `Kết nối ${label} thành công! Shop đã được thêm vào hệ thống.` });
     } else if (searchParams.get('error')) {
       const err = decodeURIComponent(searchParams.get('error') ?? 'Lỗi không xác định');
       setBanner({ type: 'err', msg: `Kết nối thất bại: ${err}` });
     }
-  }, [loadConfig, loadShops, searchParams, label]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => { if (tab === 'products') { loadProducts(); loadListings(); } }, [tab, loadProducts, loadListings]);
   useEffect(() => { if (tab === 'orders') loadOrders(); }, [tab, loadOrders]);
@@ -880,11 +885,11 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
 
       {/* ── Platform Header ─────────────────────────────────────────────────── */}
       <div className="rounded-[18px] p-5 mb-5 flex items-center justify-between"
-        style={{ background: colorLight, border: `1px solid ${colorBorder}` }}>
+        style={{ background: 'var(--smc-surface-2)', border: '1px solid var(--smc-border)', borderLeft: `4px solid ${color}` }}>
         <div className="flex items-center gap-4">
           <div className="w-12 h-12 rounded-[14px] flex items-center justify-center flex-shrink-0" style={{ background: color }}>{logo}</div>
           <div>
-            <h1 className="text-[20px] font-extrabold tracking-tight" style={{ color: colorDark }}>{label}</h1>
+            <h1 className="text-[20px] font-extrabold tracking-tight" style={{ color: 'var(--smc-text)' }}>{label}</h1>
             <p className="text-[13px] mt-0.5" style={{ color }}>
               {loadingShops ? 'Đang tải...' : `${shops.length} shop · ${activeShops} active · ${fmtMoney(totalRevenue)} doanh thu`}
             </p>
@@ -892,7 +897,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
         </div>
         <div className="flex items-center gap-3">
           <div className="text-right">
-            <div className="text-[14px] font-bold" style={{ color: colorDark }}>{totalOrders.toLocaleString('vi-VN')} đơn</div>
+            <div className="text-[14px] font-bold" style={{ color: 'var(--smc-text)' }}>{totalOrders.toLocaleString('vi-VN')} đơn</div>
             <div className="text-[11px]" style={{ color }}>tổng đơn hàng</div>
           </div>
           {configStatus && !configStatus.configured && (
@@ -988,7 +993,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                         {(ts === 'soon' || ts === 'expired') && (
                           <button onClick={() => refreshToken(shop.id)} disabled={refreshing === shop.id}
                             className="flex items-center gap-1 px-3 py-1.5 rounded-[8px] text-[12px] font-semibold border transition-all hover:opacity-80"
-                            style={{ color: color, borderColor: colorBorder, background: colorLight }}>
+                            style={{ color: color, borderColor: colorBorder, background: 'var(--smc-surface-3)' }}>
                             <KeyRound size={12}/>{refreshing === shop.id ? 'Đang làm mới...' : 'Làm mới token'}
                           </button>
                         )}
@@ -1111,7 +1116,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                   const isSelected = selectedIds.has(p.id);
                   return (
                     <tr key={p.id}
-                      style={{ borderBottom: '1px solid var(--smc-border)', background: isSelected ? colorLight : undefined, cursor: 'pointer' }}
+                      style={{ borderBottom: '1px solid var(--smc-border)', background: isSelected ? 'var(--smc-nav-active)' : undefined, cursor: 'pointer' }}
                       onClick={() => toggleSelect(p.id)}>
                       <td className="px-4 py-3" onClick={e => e.stopPropagation()}>
                         <button onClick={() => toggleSelect(p.id)} className="flex items-center justify-center w-5 h-5">
@@ -1158,7 +1163,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                           </button>
                           <button onClick={() => openPublishDrawer(p)} disabled={shops.length === 0}
                             className="flex items-center gap-1 px-2.5 py-1.5 rounded-[8px] text-[12px] font-semibold border transition-all hover:opacity-80 disabled:opacity-40"
-                            style={{ color, borderColor: colorBorder, background: colorLight }}>
+                            style={{ color, borderColor: colorBorder, background: 'transparent' }}>
                             <Zap size={12}/>{pListings.length > 0 ? 'Đăng' : 'Đăng'}
                           </button>
                         </div>
@@ -1223,7 +1228,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                   <option value="resolved">Hoàn thành</option>
                 </select>
                 <button onClick={loadReturns} className="px-3 py-2 rounded-[10px] text-[13px] font-semibold border"
-                  style={{ color, borderColor: colorBorder, background: colorLight }}>
+                  style={{ color, borderColor: colorBorder, background: 'var(--smc-surface-3)' }}>
                   <RefreshCw size={14}/>
                 </button>
                 {returnsStats && (
@@ -1294,7 +1299,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                               {ret.status === 'approved' && (
                                 <button onClick={() => resolveReturn(ret.id, 'resolved')}
                                   className="flex items-center gap-1 px-2 py-1 rounded-[6px] text-[11px] font-semibold border"
-                                  style={{ color, borderColor: colorBorder, background: colorLight }}>
+                                  style={{ color, borderColor: colorBorder, background: 'transparent' }}>
                                   <CheckCircle size={11}/> Hoàn thành
                                 </button>
                               )}
@@ -2023,13 +2028,13 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
       {/* ════════════════ LIVE SESSION DETAIL MODAL ════════════════ */}
       {selectedSession && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}>
-          <div className="rounded-[20px] p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style={{ background: 'var(--smc-card)', border: '1px solid var(--smc-border)' }}>
+          <div className="rounded-[20px] p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto" style={{ background: 'var(--smc-surface-2)', border: '1px solid var(--smc-border)' }}>
             <div className="flex items-start justify-between mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-1">
                   {selectedSession.status === 'live' && <span className="flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded-full text-white" style={{ background: '#ef4444' }}><Radio size={9} className="animate-pulse"/> LIVE</span>}
                   {selectedSession.status === 'ended' && <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'var(--smc-border)', color: 'var(--smc-text-4)' }}>Đã kết thúc</span>}
-                  {selectedSession.status === 'scheduled' && <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: colorLight, color }}><Play size={9} className="inline mr-1"/>Sắp diễn ra</span>}
+                  {selectedSession.status === 'scheduled' && <span className="text-[11px] font-bold px-2 py-0.5 rounded-full" style={{ background: 'var(--smc-surface-3)', color }}><Play size={9} className="inline mr-1"/>Sắp diễn ra</span>}
                 </div>
                 <h3 className="text-[17px] font-extrabold" style={{ color: 'var(--smc-text)' }}>{selectedSession.title}</h3>
                 <div className="text-[12px] mt-1 flex items-center gap-3" style={{ color: 'var(--smc-text-3)' }}>
@@ -2072,7 +2077,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
               </div>
               {(scriptPreview || selectedSession.script) ? (
                 <div className="text-[12px] leading-relaxed whitespace-pre-wrap rounded-[8px] p-3 max-h-[200px] overflow-y-auto"
-                  style={{ background: 'var(--smc-card)', color: 'var(--smc-text-3)', border: '1px solid var(--smc-border)' }}>
+                  style={{ background: 'var(--smc-surface-2)', color: 'var(--smc-text-3)', border: '1px solid var(--smc-border)' }}>
                   {scriptPreview || selectedSession.script}
                 </div>
               ) : (
@@ -2106,7 +2111,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
       {/* ════════════════ LIVE FORM MODAL ════════════════ */}
       {liveFormOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}>
-          <div className="rounded-[20px] p-6 w-full max-w-md shadow-2xl" style={{ background: 'var(--smc-card)', border: '1px solid var(--smc-border)' }}>
+          <div className="rounded-[20px] p-6 w-full max-w-md shadow-2xl" style={{ background: 'var(--smc-surface-2)', border: '1px solid var(--smc-border)' }}>
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[16px] font-bold" style={{ color: 'var(--smc-text)' }}>Lên lịch phiên LIVE</h3>
               <button onClick={() => setLiveFormOpen(false)} style={{ color: 'var(--smc-text-4)' }}><X size={18}/></button>
@@ -2498,11 +2503,11 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
       {prodDrawerOpen && (
         <div className="fixed inset-0 z-50 flex justify-end" style={{ background: 'rgba(0,0,0,0.4)' }} onClick={() => setProdDrawerOpen(false)}>
           <div className="h-full w-full max-w-2xl flex flex-col shadow-2xl overflow-hidden"
-            style={{ background: 'var(--smc-card)', borderLeft: '1px solid var(--smc-border)' }}
+            style={{ background: 'var(--smc-surface)', borderLeft: `3px solid ${color}` }}
             onClick={e => e.stopPropagation()}>
 
             {/* Drawer header */}
-            <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--smc-border)' }}>
+            <div className="flex items-center justify-between px-6 py-4 flex-shrink-0" style={{ borderBottom: '1px solid var(--smc-border)', background: 'var(--smc-surface-2)' }}>
               <div>
                 <h2 className="text-[16px] font-extrabold" style={{ color: 'var(--smc-text)' }}>
                   {prodDrawerMode === 'create' ? 'Thêm sản phẩm mới' : `Chỉnh sửa: ${prodForm.name || '—'}`}
@@ -2519,7 +2524,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
               <div className="grid grid-cols-2 gap-0 h-full">
 
                 {/* LEFT: Form fields */}
-                <div className="p-6 space-y-4" style={{ borderRight: '1px solid var(--smc-border)' }}>
+                <div className="p-6 space-y-4 overflow-y-auto" style={{ borderRight: '1px solid var(--smc-border)' }}>
                   <div className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--smc-text-4)' }}>Thông tin sản phẩm</div>
 
                   {/* Name with AI button */}
@@ -2528,7 +2533,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                       <label className="text-[12px] font-semibold" style={{ color: 'var(--smc-text-3)' }}>Tên sản phẩm *</label>
                       <button onClick={() => aiGenerateForProduct('name')} disabled={aiField === 'name'}
                         className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full disabled:opacity-60"
-                        style={{ background: colorLight, color }}>
+                        style={{ background: 'var(--smc-surface-3)', color }}>
                         {aiField === 'name' ? <><RefreshCw size={9} className="animate-spin"/> Đang tạo...</> : <><Sparkles size={9}/> AI tạo tiêu đề</>}
                       </button>
                     </div>
@@ -2581,8 +2586,8 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
 
                   {/* Profit calc */}
                   {prodForm.price && prodForm.cost_price && (
-                    <div className="rounded-[8px] px-3 py-2 text-[11.5px]" style={{ background: colorLight }}>
-                      <span style={{ color: colorDark }}>
+                    <div className="rounded-[8px] px-3 py-2 text-[11.5px]" style={{ background: 'var(--smc-surface-3)', border: '1px solid var(--smc-border)' }}>
+                      <span style={{ color: 'var(--smc-text-2)' }}>
                         Lợi nhuận: {fmtMoney((Number(prodForm.sale_price || prodForm.price) - Number(prodForm.cost_price)))} ·{' '}
                         Margin: {(((Number(prodForm.sale_price || prodForm.price) - Number(prodForm.cost_price)) / Number(prodForm.sale_price || prodForm.price)) * 100).toFixed(1)}%
                       </span>
@@ -2611,7 +2616,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                       <label className="text-[12px] font-semibold" style={{ color: 'var(--smc-text-3)' }}>Mô tả sản phẩm</label>
                       <button onClick={() => aiGenerateForProduct('description')} disabled={aiField === 'description'}
                         className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full disabled:opacity-60"
-                        style={{ background: colorLight, color }}>
+                        style={{ background: 'var(--smc-surface-3)', color }}>
                         {aiField === 'description' ? <><RefreshCw size={9} className="animate-spin"/> Đang tạo...</> : <><Sparkles size={9}/> AI viết mô tả</>}
                       </button>
                     </div>
@@ -2641,7 +2646,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                 </div>
 
                 {/* RIGHT: AI Panel */}
-                <div className="p-6 flex flex-col gap-4" style={{ background: 'var(--smc-surface)' }}>
+                <div className="p-6 flex flex-col gap-4 overflow-y-auto" style={{ background: 'var(--smc-surface-2)' }}>
                   <div className="text-[11px] font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5" style={{ color }}>
                     <Sparkles size={12}/> AI Tối ưu nội dung
                   </div>
@@ -2655,7 +2660,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                     ].map(action => (
                       <button key={action.id} onClick={() => aiGenerateForProduct(action.id)} disabled={!!aiField}
                         className="w-full text-left px-4 py-3 rounded-[12px] border transition-all hover:opacity-90 disabled:opacity-50"
-                        style={{ background: 'var(--smc-card)', border: `1px solid ${colorBorder}` }}>
+                        style={{ background: 'var(--smc-surface-2)', border: `1px solid ${colorBorder}` }}>
                         <div className="flex items-center gap-2 mb-0.5">
                           <span style={{ color }}>{action.icon}</span>
                           <span className="text-[13px] font-semibold" style={{ color: 'var(--smc-text)' }}>{action.label}</span>
@@ -2668,7 +2673,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
 
                   {/* AI Result */}
                   {aiFieldResult && (
-                    <div className="rounded-[12px] p-4 flex-1" style={{ background: 'var(--smc-card)', border: `1px solid ${colorBorder}` }}>
+                    <div className="rounded-[12px] p-4 flex-1" style={{ background: 'var(--smc-surface-2)', border: `1px solid ${colorBorder}` }}>
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-[11px] font-bold uppercase" style={{ color }}>
                           {aiFieldResult.field === 'name' ? 'Gợi ý tiêu đề' : aiFieldResult.field === 'description' ? 'Mô tả đã tạo' : 'Phân tích SEO'}
@@ -2695,7 +2700,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
 
                   {/* SEO Score Preview */}
                   {!aiFieldResult && (
-                    <div className="rounded-[12px] p-4" style={{ background: 'var(--smc-card)', border: '1px solid var(--smc-border)' }}>
+                    <div className="rounded-[12px] p-4" style={{ background: 'var(--smc-surface-2)', border: '1px solid var(--smc-border)' }}>
                       <div className="text-[11px] font-bold mb-3 uppercase" style={{ color: 'var(--smc-text-4)' }}>Điểm SEO hiện tại</div>
                       {(() => {
                         let score = 0;
@@ -2735,7 +2740,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
             </div>
 
             {/* Drawer footer */}
-            <div className="flex items-center gap-3 px-6 py-4 flex-shrink-0" style={{ borderTop: '1px solid var(--smc-border)' }}>
+            <div className="flex items-center gap-3 px-6 py-4 flex-shrink-0" style={{ borderTop: '1px solid var(--smc-border)', background: 'var(--smc-surface-2)' }}>
               <button onClick={() => setProdDrawerOpen(false)}
                 className="px-5 py-2.5 rounded-[12px] text-[13px] font-semibold border"
                 style={{ color: 'var(--smc-text-3)', borderColor: 'var(--smc-border)', background: 'var(--smc-surface)' }}>
@@ -2750,7 +2755,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                 <button onClick={async () => { await saveProduct(); if (!prodSaveErr) { /* open publish */ } }}
                   disabled={prodSaving || !prodForm.name || !prodForm.price}
                   className="px-4 py-2.5 rounded-[12px] text-[13px] font-bold border disabled:opacity-60"
-                  style={{ color, borderColor: colorBorder, background: colorLight }}>
+                  style={{ color, borderColor: colorBorder, background: 'transparent' }}>
                   Lưu & Đăng ngay
                 </button>
               )}
@@ -2762,7 +2767,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
       {/* ════════════════ AFFILIATE ENROLL MODAL ════════════════ */}
       {enrollOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.5)' }}>
-          <div className="rounded-[20px] p-6 w-full max-w-md shadow-2xl" style={{ background: 'var(--smc-card)', border: '1px solid var(--smc-border)' }}>
+          <div className="rounded-[20px] p-6 w-full max-w-md shadow-2xl" style={{ background: 'var(--smc-surface-2)', border: '1px solid var(--smc-border)' }}>
             <div className="flex items-center justify-between mb-5">
               <h3 className="text-[16px] font-bold" style={{ color: 'var(--smc-text)' }}>Đăng ký SP vào Affiliate</h3>
               <button onClick={() => setEnrollOpen(false)} style={{ color: 'var(--smc-text-4)' }}><X size={18}/></button>
@@ -2793,7 +2798,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                     onChange={e => setEnrollRate(e.target.value)}
                     className="flex-1" style={{ accentColor: color }}/>
                   <div className="w-16 px-2 py-1.5 rounded-[8px] text-[13px] font-bold text-center"
-                    style={{ background: colorLight, color }}>{enrollRate}%</div>
+                    style={{ background: 'var(--smc-surface-3)', color }}>{enrollRate}%</div>
                 </div>
                 <div className="text-[11px] mt-1" style={{ color: 'var(--smc-text-4)' }}>
                   {enrollProductId && products.find(p => p.id === Number(enrollProductId)) && (
