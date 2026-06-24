@@ -2575,7 +2575,7 @@ export default function PlatformHub({ cfg }: { cfg: PlatformConfig }) {
                     ].map(f => (
                       <div key={f.key}>
                         <label className="text-[12px] font-semibold mb-1 block" style={{ color: 'var(--smc-text-3)' }}>{f.label}</label>
-                        <input type="number" value={(prodForm as Record<string,string>)[f.key]}
+                        <input type="number" value={prodForm[f.key as 'price' | 'cost_price' | 'sale_price']}
                           onChange={e => setProdForm(prev => ({ ...prev, [f.key]: e.target.value }))}
                           placeholder={f.placeholder}
                           className="w-full px-3 py-2 rounded-[10px] text-[13px] outline-none"
